@@ -9,7 +9,24 @@ const play = document.querySelector("#start-pause");
 const botoes = document.querySelectorAll(".app__card-button");
 const musicaFocus = document.querySelector("#alternar-musica");
 const musica = new Audio("/sons/luna-rise-part-one.mp3");
-musica.loop = true
+musica.loop = true;
+const audioPlay = new Audio("/sons/play.wav");
+const audioPause = new Audio("/sons/pause.mp3");
+const audioFim = new Audio("/sons/beep.mp3");
+
+let intervaloId = null;
+timer = null;
+
+const contagemRegressiva = () => {
+    if (timer <= 0) {
+        audioFim.play();
+        alert("Tempo Finalizado!");
+        reset();
+        return;
+    }
+    timer -= 1;
+    console.log(timer);
+};
 
 function alterarContexto(contexto) {
     html.setAttribute("data-contexto", `${contexto}`);
@@ -17,30 +34,31 @@ function alterarContexto(contexto) {
     botoes.forEach((contexto) => {
         contexto.classList.remove("active");
     });
+
     switch (contexto) {
         case "foco":
             texto.innerHTML = `
-      Otimize sua produtividade,<br>
-      <strong class="app__title-strong">mergulhe no que importa.</strong>
-      `;
+            Otimize sua produtividade,<br>
+            <strong class="app__title-strong">mergulhe no que importa.</strong>
+            `;
             focoBtn.classList.add("active");
             timer = 1500;
             break;
 
         case "descanso-curto":
             texto.innerHTML = `
-      Que tal dar uma respirada?<br>
-      <strong class="app__title-strong">Faça uma pausa curta!</strong>
-      `;
+            Que tal dar uma respirada?<br>
+            <strong class="app__title-strong">Faça uma pausa curta!</strong>
+            `;
             curtoBtn.classList.add("active");
             timer = 300;
             break;
 
         case "descanso-longo":
             texto.innerHTML = `
-      Hora de voltar à superfície.<br>
-      <strong class="app__title-strong">Faça uma pausa longa.</strong>
-      `;
+            Hora de voltar à superfície.<br>
+            <strong class="app__title-strong">Faça uma pausa longa.</strong>
+            `;
             longoBtn.classList.add("active");
             timer = 900;
             break;
@@ -69,3 +87,20 @@ curtoBtn.addEventListener("click", () => {
 longoBtn.addEventListener("click", () => {
     alterarContexto("descanso-longo");
 });
+
+play.addEventListener("click", playPause);
+
+function playPause() {
+    if (intervaloId) {
+        audioPause.play();
+        reset();
+        return;
+    }
+    audioPlay.play();
+    intervaloId = setInterval(contagemRegressiva, 1000);
+}
+
+function reset() {
+    clearInterval(intervaloId);
+    intervaloId = null;
+}
